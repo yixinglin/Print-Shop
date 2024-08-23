@@ -1,0 +1,138 @@
+import cups 
+import json
+import time
+
+def convert_doc_to_pdf():
+    pass 
+
+def convert_img_to_pdf():
+    pass 
+  
+def print_jobs():
+    print("Print Jobs")
+    conn = cups.Connection()
+    jobs = conn.getJobs()
+    return jobs
+
+def printer_status(printer):
+    print("Printer Status")
+    conn = cups.Connection()
+    attrs = conn.getPrinterAttributes(printer)
+    status = {}
+    status['printer-state'] = attrs['printer-state']  # 3: idle, 4: printing, 5: stopped
+    status['printer-state-message'] = attrs['printer-state-message']
+    status['printer-state-reasons'] = attrs['printer-state-reasons']
+    status['printer-type'] = attrs['printer-type']
+    status['printer-is-accepting-jobs'] = attrs['printer-is-accepting-jobs']
+    status['printer-info'] = attrs['printer-info']
+    status['printer-location'] = attrs['printer-location']
+    status['printer-make-and-model'] = attrs['printer-make-and-model']
+    status['printer-uri-supported'] = attrs['printer-uri-supported']
+    status['printer-op-policy'] = attrs['printer-op-policy']
+    return status
+
+def printer_attributes(printer):
+    print("Printer Attributes")
+    conn = cups.Connection()
+    attrs = conn.getPrinterAttributes(printer)
+    return attrs
+
+def printer_attributes_brief(printer):
+    print('Printer Brief Attributes ')
+    conn = cups.Connection()
+    attrs = conn.getPrinterAttributes(printer)
+    brief = {}
+    brief['printer-id'] = attrs['printer-id']
+    brief['printer-name'] = attrs['printer-name']
+    brief['printer-info'] = attrs['printer-info']
+    brief['printer-uri-supported'] = attrs['printer-uri-supported']
+    brief['printer-location'] = attrs['printer-location']
+    brief['printer-name'] = attrs['printer-name']
+    brief['print-scaling-supported'] = attrs['print-scaling-supported']
+    brief['pdf-versions-supported'] = attrs['pdf-versions-supported']
+    brief['orientation-requested-supported'] = attrs['orientation-requested-supported']
+    brief['which-jobs-supported'] = attrs['which-jobs-supported']
+    brief['job-settable-attributes-supported'] = attrs['job-settable-attributes-supported']  
+    brief['printer-resolution-supported']   = attrs['printer-resolution-supported']
+    return brief
+
+def list_printers():
+    print("List Printers")
+    conn = cups.Connection()
+    printers = conn.getPrinters()
+    return printers 
+
+
+def create_job(printer_name, file_path, title, options):
+    print(f"Create Job ({title}) with options:\n{options}")
+    print(f"File Path: {file_path}")
+    conn = cups.Connection() 
+    job_id = conn.printFile(printer_name, file_path, title, options)
+    print("Job ID:", job_id)
+    return job_id
+
+
+def cancel_job(job_id):
+    print("Cancel Job")
+    conn = cups.Connection()    
+    conn.cancelJob(job_id)
+    print("Job", job_id, "cancelled")   
+    return job_id
+
+def create_options(copies=1, sides='one-sided', 
+                   collate=None, fit_to_page=None, 
+                   page_ranges=None, landscape=None,  
+                   print_color_mode = "monochrome", 
+                   print_quality="normal", 
+                   print_scaling=None, 
+                   resolution="300",
+                   page_set=None,
+                   media='default'):
+    options = {}
+    options['copies'] = str(copies)  # number of copies to print
+    options['sides'] = sides # 'one-sided', 'two-sided-long-edge', 'two-sided-short-edge', 'two-sided-short-edge-flip', 'two-sided-long-edge-flip'
+    if collate:
+        options['collate'] = collate # True or False, collate multiple copies of each page on a single sheet of paper
+    if fit_to_page:
+        options['fit-to-page'] = fit_to_page # True or False, fit the printable area to the page size
+    if page_ranges:
+        options['page-ranges'] = page_ranges # '1-5', '1,3,5'
+    if page_set:
+        options['page-set'] = page_set # 'first', 'last', 'even', 'odd', 'next', 'previous'
+    if landscape:
+        options['landscape'] = landscape # True or False, rotate the printable area 90 degrees
+    options['media'] = media  # 'default', 'a4', 'a5', 'b5', 'legal', 'letter', 'executive', 'tabloid'
+    options['print-color-mode'] = print_color_mode # monochrome, color
+    options['print-quality'] = print_quality # draft, normal, high
+    if print_scaling:
+        options['print-scaling'] = print_scaling # auto, none, fill, fit
+    options['printer-resolution'] = resolution # 300, 600, 1200, 2400
+    return options
+
+
+def test_query(printer):
+    status = printer_status(printer)
+    # print(status)
+    printers = list_printers()
+    for printer in printers:
+        print(printer)
+
+
+
+if __name__ == '__main__':
+    # print_jobs()
+    #test_query('Virtual_PDF_Printer')
+    #printer_attributes_brief('Virtual_PDF_Printer')
+    printer = 'Virtual_PDF_Printer'
+    source = './doc/manual_even.pdf'
+    # options = create_options(copies=5, sides='one-sided', collate="false", 
+    #                          fit_to_page='none', page_ranges="", landscape='false', 
+    #                          print_color_mode='color', print_quality='normal', page_set='even', 
+    #                        print_scaling='none', resolution='150dpi', media='b5')    
+    options = create_options(page_set='even', 
+                            resolution='150dpi', media='b5')    
+    create_job(printer, source, 'Test Job', options)    
+    for i in range(10):
+        status = printer_status(printer)
+        time.sleep(0.5)
+        print(status['printer-state'])
