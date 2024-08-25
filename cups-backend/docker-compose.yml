@@ -1,0 +1,13 @@
+
+version: '3'
+
+services:
+  cups-api:
+    build: .
+    image: yixing/cups-api 
+    container_name: cups-api    
+    network_mode: host         
+    volumes:
+      - ./history:/code/history
+    environment:
+      - NODE_ENV=production
