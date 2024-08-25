@@ -1,6 +1,15 @@
 import cups 
 import json
 import time
+from typing import List
+from pydantic import BaseModel
+
+class PrintJob(BaseModel):
+    printer_name: str
+    filename: str  # filename in the history directory
+    title: str = "Print Job"
+    options: dict={}
+
 
 def convert_doc_to_pdf():
     pass 
@@ -43,8 +52,12 @@ def printer_attributes_brief(printer):
     attrs = conn.getPrinterAttributes(printer)
     brief = {}
     brief['printer-id'] = attrs['printer-id']
+    brief['printer-uuid'] = attrs['printer-uuid']
     brief['printer-name'] = attrs['printer-name']
     brief['printer-info'] = attrs['printer-info']
+    brief['printer-state'] = attrs['printer-state']
+    brief['printer-state-message'] = attrs['printer-state-message']
+    brief['printer-state-reasons'] = attrs['printer-state-reasons']
     brief['printer-uri-supported'] = attrs['printer-uri-supported']
     brief['printer-location'] = attrs['printer-location']
     brief['printer-name'] = attrs['printer-name']
@@ -54,23 +67,43 @@ def printer_attributes_brief(printer):
     brief['which-jobs-supported'] = attrs['which-jobs-supported']
     brief['job-settable-attributes-supported'] = attrs['job-settable-attributes-supported']  
     brief['printer-resolution-supported']   = attrs['printer-resolution-supported']
+    brief['sides-supported'] = attrs['sides-supported']
+    brief['cups-version'] = attrs['cups-version']
+    brief['media-supported'] = attrs['media-supported']
+    brief['document-format-supported'] = attrs['document-format-supported']
     return brief
 
-def list_printers():
+
+
+def list_printers() -> List:
     print("List Printers")
     conn = cups.Connection()
-    printers = conn.getPrinters()
+    printers = []
+    for k, v in conn.getPrinters().items():
+        v['printer-name'] = k
+        printers.append(v)
     return printers 
 
+import utils 
 
-def create_job(printer_name, file_path, title, options):
+def create_job(printer_name: str, file_path: str, title: str, options: dict):
     print(f"Create Job ({title}) with options:\n{options}")
     print(f"File Path: {file_path}")
     conn = cups.Connection() 
+
+    if options:
+        # Remove empty fields
+        options = {k: v for k, v in options.items() if not utils.isEmptyString(v)}
+        print(f"Options after removing empty fields: {options}")
     job_id = conn.printFile(printer_name, file_path, title, options)
     print("Job ID:", job_id)
     return job_id
 
+def job_attributes(job_id):
+    print(f"Job Attributes  ({job_id})")
+    conn = cups.Connection()
+    attrs = conn.getJobAttributes(job_id)
+    return attrs
 
 def cancel_job(job_id):
     print("Cancel Job")
@@ -78,6 +111,9 @@ def cancel_job(job_id):
     conn.cancelJob(job_id)
     print("Job", job_id, "cancelled")   
     return job_id
+
+
+
 
 def create_options(copies=1, sides='one-sided', 
                    collate=None, fit_to_page=None, 
@@ -109,7 +145,6 @@ def create_options(copies=1, sides='one-sided',
     options['printer-resolution'] = resolution # 300, 600, 1200, 2400
     return options
 
-
 def test_query(printer):
     status = printer_status(printer)
     # print(status)
@@ -118,21 +153,20 @@ def test_query(printer):
         print(printer)
 
 
-
 if __name__ == '__main__':
     # print_jobs()
     #test_query('Virtual_PDF_Printer')
     #printer_attributes_brief('Virtual_PDF_Printer')
     printer = 'Virtual_PDF_Printer'
-    source = './doc/manual_even.pdf'
+    source = './doc/dhl.pdf'
     # options = create_options(copies=5, sides='one-sided', collate="false", 
     #                          fit_to_page='none', page_ranges="", landscape='false', 
     #                          print_color_mode='color', print_quality='normal', page_set='even', 
     #                        print_scaling='none', resolution='150dpi', media='b5')    
-    options = create_options(page_set='even', 
-                            resolution='150dpi', media='b5')    
+    options = create_options(resolution='300dpi', media='custom_1682.04x2380.9mm_1682.04x2380.9mm')    
     create_job(printer, source, 'Test Job', options)    
     for i in range(10):
         status = printer_status(printer)
         time.sleep(0.5)
         print(status['printer-state'])
+    
