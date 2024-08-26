@@ -81,7 +81,8 @@ def list_printers() -> List:
     printers = []
     for k, v in conn.getPrinters().items():
         v['printer-name'] = k
-        printers.append(v)
+        if v['printer-is-shared'] == True:
+            printers.append(v)
     return printers 
 
 import utils 
