@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Table, Pagination, Button, Space, Input} from 'antd';
+import { Table, Pagination, Button, Space, Input, Flex } from 'antd';
 import { PrinterOutlined, DeleteOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import UploadButton from './buttons/UploadButton';
 import DeleteConfirmButton from './buttons/DeleteConfirmButton';
-import  {get_upload_file_url} from '../rest/printer'
+import { get_upload_file_url } from '../rest/printer'
 
 const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDownload,
-                                    handleAdd, handleEmpty }) => {
+  handleAdd, handleEmpty }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchText, setSearchText] = useState('');
@@ -38,16 +38,16 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
           <Button
             type="primary"
             icon={<PrinterOutlined />}
-            onClick={() => {handlePrint? handlePrint(record) : null}}
+            onClick={() => { handlePrint ? handlePrint(record) : null }}
           />
-          <Button           
+          <Button
             icon={<EyeOutlined />}
-            onClick={() => {handleDownload? handleDownload(record) : null}}
+            onClick={() => { handleDownload ? handleDownload(record) : null }}
           />
-          <Button            
+          <Button
             danger
             icon={<DeleteOutlined />}
-            onClick={() => {handleDelete? handleDelete(record) : null}}
+            onClick={() => { handleDelete ? handleDelete(record) : null }}
           />
         </Space>
       ),
@@ -82,39 +82,39 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
   const paginatedFiles = filteredFiles.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
-    <div>      
-      <Space size="large" style={{ marginBottom: '20px' }}>
-        <UploadButton url={get_upload_file_url()} />
+    <div>
+      <Flex  gap="large" wrap style={{ marginBottom: '10px' }} >        
         <Input
           placeholder="Search by filename"
           prefix={<SearchOutlined />}
           value={searchText}
           onChange={handleSearch}
-          style={{width: '300px' }}
-        />                
-        <Button type="primary" onClick={() => {resetSearchKeyword ? resetSearchKeyword() : null } } >Reset</Button>    
+          style={{ width: '300px' }}
+        />
+        <Button type="primary" onClick={() => { resetSearchKeyword ? resetSearchKeyword() : null }} >Reset</Button>
 
-      <DeleteConfirmButton 
-        buttonText="Empty History" 
-        popconfirmTitle="Delete the history"
-        popconfirmDescription="Are you sure you want to delete the history?"
-        confirmText="Yes, delete it"
-        cancelText="No"
-        handleConfirm={() => {handleEmpty ? handleEmpty() : null }} 
-        danger
-      />
-        
-        <span>Total Size: {totalSize}</span> 
-        <span>Files: {filteredFiles.length}</span>       
-      </Space>
+        <DeleteConfirmButton
+          buttonText="Empty History"
+          popconfirmTitle="Delete the history"
+          popconfirmDescription="Are you sure you want to delete the history?"
+          confirmText="Yes, delete it"
+          cancelText="No"
+          handleConfirm={() => { handleEmpty ? handleEmpty() : null }}
+          danger
+        />
+
+        <span>Total Size: {totalSize}</span>
+        <span>Files: {filteredFiles.length}</span>
+      </Flex >
+      <UploadButton url={get_upload_file_url()} />
       <Table
         columns={columns}
         dataSource={paginatedFiles}  // 使用分页后的数据
         pagination={false}  // 关闭默认分页
         rowKey="filename"
         cellFontSizeSM={10}
-      />             
-        <Pagination
+      />
+      <Pagination
         current={currentPage}
         pageSize={pageSize}
         total={filteredFiles.length}  // 使用过滤后的数据长度
@@ -122,7 +122,7 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
         showSizeChanger
         pageSizeOptions={['10', '20', '50', '100']}
       />
-    
+
     </div>
   );
 };

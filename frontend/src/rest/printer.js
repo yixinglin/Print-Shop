@@ -8,11 +8,27 @@ const apiUrl = `http://${domain}:${port}/cups`;
 const wsUrl = `ws://${domain}:${port}/cups/ws`;
 const cupsUrl = `http://${domain}:631`;
 
-
-function get_method(url) {
-    return axios.get(url, );
+function calc_token() {
+    const username = import.meta.env.VITE_API_USERNAME;
+    const password = import.meta.env.VITE_API_PASSWORD;    
+    const token = btoa(`${username}:${password}`);
+    return token;
 }
 
+
+function get_method(url) { 
+    const headers = {};
+    headers['Authorization'] = `Basic ${calc_token()}`;    
+    headers['Content-Type'] = 'application/json';
+    return axios.get(url, { headers: headers });
+}
+
+function post_method(url, body) { 
+    const headers = {};
+    headers['Authorization'] = `Basic ${calc_token()}`;    
+    headers['Content-Type'] = 'application/json';
+    return axios.post(url, body, { headers: headers });
+}
 
 export function fetch_printers() {
     return get_method(apiUrl + '/printers');
@@ -39,11 +55,11 @@ export function fetch_printer_attributes(printer) {
 }
 
 export function post_create_job(body) {
-    return axios.post(apiUrl + '/jobs/create/from_history', body);
+    return post_method(apiUrl + '/jobs/create/from_history', body);
 }
 
 export function post_upload_file(body) {
-    return axios.post(apiUrl + '/history/upload/', body, {
+    return post_method(apiUrl + '/history/upload/', body, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -55,12 +71,20 @@ export function get_upload_file_url() {
     return apiUrl + '/history/upload/';
 }
 
+
+function delete_method(url) {
+    const headers = {};
+    headers['Authorization'] = `Basic ${calc_token()}`;    
+    headers['Content-Type'] = 'application/json';
+    return axios.delete(url, { headers: headers });
+}
+
 export function delete_file(filename) {
-    return axios.delete(apiUrl + '/history/file/' + filename);
+    return delete_method(apiUrl + '/history/file/' + filename);
 }
 
 export function delete_all_files() {
-    return axios.delete(apiUrl + '/history/empty');
+    return delete_method(apiUrl + '/history/empty');
 }
 
 export function get_download_file_url(filename) {

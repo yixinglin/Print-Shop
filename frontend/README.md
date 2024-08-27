@@ -19,6 +19,9 @@ npm install react-router-dom
 # Development
 npm run dev
 
+# Build Staging
+npm run build:staging
+
 # Build Production
 npm run build
 ```

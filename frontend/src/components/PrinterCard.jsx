@@ -1,3 +1,14 @@
+
+import {
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
+import { Divider, Flex, Tag } from 'antd';
+
+
+
 const PrinterCard = ({index, printer, handleClick }) => {    
   const printerName = printer.name;
   
@@ -6,11 +17,12 @@ const PrinterCard = ({index, printer, handleClick }) => {
     backgroundColor: getCardColor(getStatusName(printer.state)),
   };
 
+
   return (
     <div style={cardStyle} onClick={() => { handleClick ? handleClick(printer) : null }}>            
       <h3>{getStatusEmoji(printer.state)} {printerName}</h3>
       <p><strong>Alias:</strong> {printer.alias}</p>
-      <p><strong>Status:</strong> {getStatusName(printer.state)}</p>
+      <p><strong>Status:</strong> {createStatusTag(printer.state)}</p>      
       <p><strong>Message:</strong> {printer.state_message}</p>
       <p><strong>Reasons:</strong> {printer.state_reasons.join(', ')}</p>
     </div>
@@ -55,6 +67,20 @@ const getStatusEmoji = (state) => {
     default:
       return "❓";
   };
+}
+
+
+const createStatusTag = (status) => {
+  switch (status) {
+    case 4:
+      return <Tag icon={<SyncOutlined  spin />} color="processing">Printing</Tag>;
+    case 3:
+      return <Tag icon={<ClockCircleOutlined  />} color="success">Idle</Tag>;
+    case 5:
+      return <Tag icon={<CloseCircleOutlined />} color="error">Stopped</Tag>;
+    default:
+      return <Tag icon={<ExclamationCircleOutlined />} color="warning">Unknown</Tag>;
+  }
 }
 
 

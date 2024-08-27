@@ -84,8 +84,6 @@ function Home() {
         handleEmpty={handleEmpty}
         handleAdd={handleAdd}
         handleDelete={handleDelete} />
-
-
     </div>
   )
 }

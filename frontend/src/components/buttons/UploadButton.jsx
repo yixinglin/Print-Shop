@@ -20,20 +20,70 @@ const UploadButton = ({url}) => {
         message.error(`Error: ${errorMsg}. File ${info.file.name}  upload failed. `);        
       }
     },
+
+    beforeUpload(file) {
+      const isPDF = file.type === 'application/pdf';
+      if (!isPDF) {
+        message.error(`${file.name} is not a PDF file.`);
+      }
+      return isPDF || Upload.LIST_IGNORE;
+    },
+
     onPreview(file) {
       console.log('Preview:', file.name);
     },
     onRemove(file) {
       console.log('Remove:', file.name);
     },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files);
+    },
     
   };
-
+  
   return (
-    <Upload {...props}>
+    <Upload {...props} >
       <Button icon={<UploadOutlined />}>Click to Upload</Button>
+      {/* <p style={styles.upload_drag_icon}>
+          <UploadOutlined />
+      </p>
+      <p style={styles.upload_text}>Click or drag file to this area to upload</p>
+      <p>Support for a single or bulk upload. Only PDF files are allowed.</p> */}
     </Upload>
   );
 };
+
+// const styles = {
+//   upload_drag_icon: {
+//     border: '1px solid #d9d9d9',
+//     borderRadius: 4,
+//     padding: '20px',
+//     textAlign: 'center',
+//     color: '#999',
+//     cursor: 'pointer',
+//     width: '100%',
+//     height: '100%',
+//     display: 'flex',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     margin: '10px 0',
+//   },
+
+//   upload_text: {  
+//     margin: '10px 0',
+//     color: '#999',
+//     fontSize: '14px',
+//     textAlign: 'center',
+//     display: 'flex',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     height: '100%',
+//     width: '100%',
+//     cursor: 'pointer',
+//     border: '1px solid #d9d9d9',
+//     borderRadius: 4,
+//     padding: '20px',
+//   }
+// }
 
 export default UploadButton;

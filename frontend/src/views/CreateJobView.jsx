@@ -5,7 +5,7 @@ import PrinterList from '../components/PrinterList';
 import PrintJobForm from '../components/forms/PrintJobForm';
 import  PrintJobList  from '../components/PrintJobList.jsx';
 import PDFViewer from '../components/PDFViewer.jsx';
-import { message, Select } from 'antd';
+import { message, Select, Flex } from 'antd';
 import { useLocation } from 'react-router-dom';
 import { saveToLocalStorage, restoreFromLocalStorage } from "../core/storage"
 
@@ -234,18 +234,20 @@ function CreateJobView() {
             </div>
 
             <p style={styles.selected_printer}>🖨️【{currentPrinter['printer-name']}】 📌【{file.filename}】 </p>
-            <div style={{ display: 'flex', width: '100%', height: '100vh' }}>
-                <div style={{ flex: 1, minWidth: '300px' }}>
+    
+            <Flex wrap justify="left" gap="large">
+                <div style={{ minWidth: '300px' }}>
                     {currentPrinterAttrs ? initForm() : null}
                 </div>
-                <div style={{ flex: 1 }}>
+                <div>
                     {file && currentPrinterAttrs ? <PDFViewer url={get_download_file_url(file.filename)}
-                        width="600px" height="900" title="📃 Document" /> : null}
+                        width="380px" height="500" title="📃 Document" /> : null}
                 </div>
-            </div>
+
+            </Flex>
 
             <h2>Print Jobs (Not Implemented Yet)</h2>
-            <PrintJobList />
+            {/* <PrintJobList /> */}
 
             <a href={get_cups_admin_url()} target="_blank">CUPS Admin</a>
         </div>
