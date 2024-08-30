@@ -3,11 +3,11 @@ import { fetch_printers, post_create_job, get_printer_status_ws_listener_url ,
     fetch_printer_attributes, get_cups_admin_url, get_download_file_url } from '../rest/printer.js';
 import PrinterList from '../components/PrinterList';
 import PrintJobForm from '../components/forms/PrintJobForm';
-import  PrintJobList  from '../components/PrintJobList.jsx';
 import PDFViewer from '../components/PDFViewer.jsx';
 import { message, Select, Flex } from 'antd';
 import { useLocation } from 'react-router-dom';
 import { saveToLocalStorage, restoreFromLocalStorage } from "../core/storage"
+import { useNavigate } from 'react-router-dom';
 
 
 const { Option } = Select;
@@ -35,7 +35,7 @@ function CreateJobView() {
         fetch_printers()
             .then(response => {
                 const printers_ = response.data.printers;
-                console.log(printers_);
+                // console.log(printers_);
                 setPrinters(printers_);
                 if (printers_.length > 0) {
                     setCurrentPrinter(printers_[0]);
@@ -52,7 +52,7 @@ function CreateJobView() {
         // 当组件卸载时关闭WebSocket连接
         return () => {
             console.log("Unmounting CreateJobView");
-            // TODO: Close WebSocket connections
+            // Close WebSocket connections
             wss.forEach(ws => ws.close());
         };  
         
@@ -67,7 +67,7 @@ function CreateJobView() {
 
             fetch_printer_attributes(printerName)
                 .then(response => {
-                    console.log("Printer Attributes:", response.data);
+                    // console.log("Printer Attributes:", response.data);
                     setCurrentPrinter(pri);
                     setCurrentPrinterAttrs(response.data["printer_attributes"]);
                     setFormKey(formKey + 1)
@@ -101,7 +101,7 @@ function CreateJobView() {
     const handleReceivePrinterMessage = (printer_) => {
         // This function is called when a message is received from the printer server
         // We can use this to update the printer status in real-time
-        console.log("Printer Message:", printer_);
+        // console.log("Printer Message:", printer_);
         // Update printer status in real-time
         setPrinters((prevPrinters) =>
             prevPrinters.map((printer) =>
@@ -110,6 +110,9 @@ function CreateJobView() {
                 : printer
             )
         );
+
+        // TODO: Update print job status in real-time
+
     }
 
     /*
@@ -235,25 +238,56 @@ function CreateJobView() {
 
             <p style={styles.selected_printer}>🖨️【{currentPrinter['printer-name']}】 📌【{file.filename}】 </p>
     
-            <Flex wrap justify="left" gap="large">
+            <Flex wrap justify="left" gap="large" >
                 <div style={{ minWidth: '300px' }}>
                     {currentPrinterAttrs ? initForm() : null}
                 </div>
                 <div>
                     {file && currentPrinterAttrs ? <PDFViewer url={get_download_file_url(file.filename)}
-                        width="380px" height="500" title="📃 Document" /> : null}
-                </div>
+                        width="680px" height="600" title="📃 Document" /> : null}
+                </div>                            
+            </Flex>            
 
-            </Flex>
-
-            <h2>Print Jobs (Not Implemented Yet)</h2>
-            {/* <PrintJobList /> */}
-
+            <a href="/jobs">All Print Jobs</a>
+            <br /> <br />
             <a href={get_cups_admin_url()} target="_blank">CUPS Admin</a>
         </div>
     );
 
 }
+
+// 示例数据
+const exampleJobs = [
+    {
+      job_id: 1,
+      number_of_documents: 3,
+      job_media_progress: "50%",
+      copies: 2,
+      media: "A4",
+      page_set: "all",
+      print_color_mode: "color",
+      print_scaling: "fit",
+      time_at_creation: "2024-08-25 12:30:00",
+      job_state: "printing",
+      job_state_reasons: ["none"],
+      document_name_supplied: "example1.pdf",
+    },
+    {
+      job_id: 2,
+      number_of_documents: 1,
+      job_media_progress: "100%",
+      copies: 1,
+      media: "A3",
+      page_set: "all",
+      print_color_mode: "monochrome",
+      print_scaling: "none",
+      time_at_creation: "2024-08-25 13:00:00",
+      job_state: "completed",
+      job_state_reasons: ["completed-successfully"],
+      document_name_supplied: "example2.pdf",
+    },
+    // 其他示例任务
+  ];
 
 const styles = {
     selected_printer: {

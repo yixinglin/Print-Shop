@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Table, Tag, Space } from "antd";
+import React from "react";
+import { Table, Tag} from "antd";
 
 // 示例数据
 const exampleJobs = [
@@ -34,14 +34,14 @@ const exampleJobs = [
   // 其他示例任务
 ];
 
-const PrintJobList = () => {
-  const [jobs, setJobs] = useState([]);
+const PrintJobList = ({jobs}) => {
+  // const [jobs, setJobs] = useState([]);
 
-  useEffect(() => {
-    // 假设从API获取数据
-    // setJobs(dataFromAPI);
-    setJobs(exampleJobs); // 使用示例数据
-  }, []);
+  // useEffect(() => {
+  //   // 假设从API获取数据
+  //   // setJobs(dataFromAPI);
+  //   setJobs(exampleJobs); // 使用示例数据
+  // }, []);
 
   const columns = [
     {
@@ -59,26 +59,30 @@ const PrintJobList = () => {
         dataIndex: "document_name_supplied",
         key: "document_name_supplied",
       },
-    {
-      title: "#Documents",
-      dataIndex: "number_of_documents",
-      key: "number_of_documents",
-    },
-    {
-      title: "Progress",
-      dataIndex: "job_media_progress",
-      key: "job_media_progress",
-    },
+    // {
+    //   title: "#Docs",
+    //   dataIndex: "number_of_documents",
+    //   key: "number_of_documents",
+    //   align: "right",
+    // },
+    // {
+    //   title: "Progress",
+    //   dataIndex: "job_media_progress",
+    //   key: "job_media_progress",
+    //   align: "right",
+    // },
     {
       title: "Copies",
       dataIndex: "copies",
-      key: "copies",
+      key: "copies",     
+      align: "right", 
     },
 
     {
         title: "Job State",
         dataIndex: "job_state",
         key: "job_state",
+        align: "center",
         render: (text) => {
           let color = text === "completed" ? "green" : "blue";
           if (text === "printing") {
@@ -94,9 +98,10 @@ const PrintJobList = () => {
         },
       },
       {
-        title: "Job State Reasons",
+        title: "Reasons",
         dataIndex: "job_state_reasons",
         key: "job_state_reasons",
+        align: "center",
         render: (reasons) => (
           <>
             {reasons.map((reason) => {

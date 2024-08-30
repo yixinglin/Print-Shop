@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Table, Pagination, Button, Space, Input, Flex } from 'antd';
 import { PrinterOutlined, DeleteOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
-import UploadButton from './buttons/UploadButton';
+import UploadDragger from './buttons/UploadDragger';
 import DeleteConfirmButton from './buttons/DeleteConfirmButton';
 import { get_upload_file_url } from '../rest/printer'
 
 const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDownload,
   handleAdd, handleEmpty }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(25);
   const [searchText, setSearchText] = useState('');
 
   const columns = [
@@ -94,19 +94,19 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
         <Button type="primary" onClick={() => { resetSearchKeyword ? resetSearchKeyword() : null }} >Reset</Button>
 
         <DeleteConfirmButton
-          buttonText="Empty History"
-          popconfirmTitle="Delete the history"
-          popconfirmDescription="Are you sure you want to delete the history?"
-          confirmText="Yes, delete it"
+          buttonText="Remove All Files"
+          popconfirmTitle="Remove All Files"
+          popconfirmDescription="Are you sure you want to remove all files?"
+          confirmText="Yes, delete all"
           cancelText="No"
           handleConfirm={() => { handleEmpty ? handleEmpty() : null }}
           danger
         />
 
         <span>Total Size: {totalSize}</span>
-        <span>Files: {filteredFiles.length}</span>
+        {/* <span>Files: {filteredFiles.length}</span> */}
       </Flex >
-      <UploadButton url={get_upload_file_url()} />
+      <UploadDragger url={get_upload_file_url()} />
       <Table
         columns={columns}
         dataSource={paginatedFiles}  // 使用分页后的数据
@@ -120,7 +120,8 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
         total={filteredFiles.length}  // 使用过滤后的数据长度
         onChange={handlePageChange}
         showSizeChanger
-        pageSizeOptions={['10', '20', '50', '100']}
+        pageSizeOptions={['10', '25', '50', '100']}
+        showTotal={(total) => `Total ${total} items`}
       />
 
     </div>

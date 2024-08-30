@@ -38,14 +38,6 @@ export function fetch_printer(id) {
     return get_method(apiUrl + '/printers/' + id);
 }
 
-export function fetch_jobs(id) {
-    return get_method(apiUrl + '/printers/' + id + '/jobs');
-}
-
-export function fetch_list_history_files() {
-    return get_method(apiUrl + '/history/files');
-}
-
 export function fetch_printer_status(printer) {
     return get_method(apiUrl + '/status/' + printer);
 }
@@ -54,8 +46,24 @@ export function fetch_printer_attributes(printer) {
     return get_method(apiUrl + '/attributes/' + printer);
 }
 
+export function fetch_jobs() {
+    return get_method(apiUrl + '/jobs');
+}
+
+export function fetch_job_attributes(id) {
+    return get_method(apiUrl + `/jobs/${id}`);
+}
+
+export function delete_all_jobs() {
+    return delete_method(apiUrl + '/jobs/cancel/all/');
+}
+
 export function post_create_job(body) {
     return post_method(apiUrl + '/jobs/create/from_history', body);
+}
+
+export function fetch_list_history_files() {
+    return get_method(apiUrl + '/history/files');
 }
 
 export function post_upload_file(body) {
