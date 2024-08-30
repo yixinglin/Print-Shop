@@ -62,6 +62,15 @@ def cancel_print_job(job_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@cups.delete("/jobs/cancel/all/")
+def cancel_all_print_jobs():
+    try:
+        ans = lib.cancel_all_jobs()
+        print(ans)
+        return {"status": "All print jobs cancelled successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @cups.post("/jobs/create/from_history/")
 def create_job_print_history_file(job: lib.PrintJob):

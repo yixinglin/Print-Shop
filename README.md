@@ -32,6 +32,12 @@ The project was developed using the following technologies:
 4. Run `python3 main.py` to start the development server
 5. Open `http://localhost:634` in your browser to view the application
 
+## Backend (Docker)
+
+1. Install Docker
+2. Clone the repository
+3. Run `docker compose up --build` to start the development server
+4. Open `http://localhost:634` in your browser to view the application
 
 
 

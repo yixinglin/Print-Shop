@@ -1,8 +1,8 @@
 import cups 
-import json
 import time
 from typing import List
 from pydantic import BaseModel
+import utils 
 
 class PrintJob(BaseModel):
     printer_name: str
@@ -73,19 +73,16 @@ def printer_attributes_brief(printer):
     brief['document-format-supported'] = attrs['document-format-supported']
     return brief
 
-
-
 def list_printers() -> List:
     print("List Printers")
     conn = cups.Connection()
     printers = []
-    for k, v in conn.getPrinters().items():
-        v['printer-name'] = k
+    for k, v in conn.getPrinters().items():        
         if v['printer-is-shared'] == True:
+            v['printer-name'] = k
             printers.append(v)
     return printers 
 
-import utils 
 
 def create_job(printer_name: str, file_path: str, title: str, options: dict):
     print(f"Create Job ({title}) with options:\n{options}")
@@ -113,8 +110,16 @@ def cancel_job(job_id):
     print("Job", job_id, "cancelled")   
     return job_id
 
-
-
+def cancel_all_jobs():
+    print("Cancel All Jobs")
+    conn = cups.Connection()    
+    jobs = conn.getJobs(which_jobs='all', requested_attributes=['job-id'], my_jobs=False)
+    for job_id  in jobs:
+        try:
+            conn.cancelJob(job_id)
+            print("Job", job_id, "cancelled")   
+        except cups.IPPError:
+            print("Job", job_id, "not found")   
 
 def create_options(copies=1, sides='one-sided', 
                    collate=None, fit_to_page=None, 

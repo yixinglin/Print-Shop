@@ -3,10 +3,11 @@ version: '3'
 
 services:
   cups-api:
-    build: .
+    build: .    
     image: yixing/cups-api 
     container_name: cups-api    
     network_mode: host         
+    restart: on-failure:5
     volumes:
       - ./history:/code/history
     environment:
