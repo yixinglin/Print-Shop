@@ -5,3 +5,8 @@ def convert_bytes_to_human_readable_size(size: int):
 
 def isEmptyString(string: str):
     return string is None or string.strip() == ""
+
+import datetime
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+def current_time(format=DATETIME_FORMAT):
+    return datetime.datetime.now().strftime(format)

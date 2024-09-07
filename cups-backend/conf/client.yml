@@ -1,0 +1,21 @@
+
+debug: true
+env: dev
+
+server:
+  host: http://192.168.8.70
+  port: 634
+  username: admin
+  password: password
+
+logging:
+  level: INFO
+  format: "[%(levelname)s] %(asctime)s | %(message)s"
+  datefmt: "%Y-%m-%d %H:%M:%S"
+  path: temp/logs/client.log
+  max_size: 10000000
+  backup_count: 5
+
+jobs:
+  path: temp/client/jobs
+  interval: 10

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, HTTPException
 from fastapi.responses import FileResponse
-import utils
+from utils import StrUtil
 import datetime
 from urllib.parse import quote
 import os

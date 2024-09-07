@@ -1,0 +1,12 @@
+PLINK v1.90b7.4 64-bit (18 Aug 2024)
+Options in effect:
+  --pw xx8615937xx root@192.168.8.10 cd /data/workspace/printshop/cups-backend && tar -xzf backup_20240906225240.tar.gz && rm backup_20240906225240.tar.gz
+
+Hostname: DESKTOP-4V3FSJ3
+Working directory: G:\hansagt\Print-Shop\cups-backend
+Start time: Fri Sep 06 22:52:41 2024
+
+Error: Unrecognized flag ('-pw').
+For more information, try "plink --help <flag name>" or "plink --help | more".
+
+End time: Fri Sep 06 22:52:41 2024

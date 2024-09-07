@@ -1,0 +1,44 @@
+
+debug: true
+env: dev
+
+project_name: Print Shop API
+version: 1.0.0
+summary: Print Shop Server API
+email: yixing.lin525@gmail.com
+author: yixing.lin
+url: https://github.com/yixinglin
+
+
+history:
+  path: temp/server/history
+
+logging:
+  level: INFO
+  format: "[%(levelname)s] %(asctime)s | %(filename)s:%(lineno)d | %(message)s"
+  datefmt: "%Y-%m-%d %H:%M:%S"
+  path: temp/logs
+  max_size: 10000000
+  backup_count: 12
+
+redis:
+  host: 192.168.8.10
+  port: 6379
+  db: 0
+  password:
+
+mongodb:
+  host: 192.168.8.10
+  port: 27017
+  db: server
+  username:
+  password:
+
+sqlite:
+  file: temp/server/data.db
+  
+
+
+
+
+

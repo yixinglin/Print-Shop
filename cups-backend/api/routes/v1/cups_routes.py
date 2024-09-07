@@ -1,7 +1,7 @@
 
-from fastapi import APIRouter, UploadFile, HTTPException
+from fastapi import APIRouter, HTTPException
 import os
-import services.lib as lib 
+import client.lib as lib
 from .print_history import history_file_path
 
 cups = APIRouter(prefix="/cups", tags=["CUPS Backend"])

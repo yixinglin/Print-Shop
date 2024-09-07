@@ -1,14 +1,10 @@
 import cups 
 import time
 from typing import List
-from pydantic import BaseModel
-import utils 
+import utils.StrUtil as utils
 
-class PrintJob(BaseModel):
-    printer_name: str
-    filename: str  # filename in the history directory
-    title: str = "Print Job"
-    options: dict={}
+
+
 
 
 def convert_doc_to_pdf():
