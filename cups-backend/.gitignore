@@ -1,1 +1,8 @@
 venv
+backup
+temp
+.idea
+ssh
+database
+conf
+test_*.py

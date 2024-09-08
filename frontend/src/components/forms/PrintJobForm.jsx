@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Select, InputNumber, Radio } from 'antd';
 
-const PrintJobForm = ({title, formValues, formOptions, key, onFinish }) => {
+const PrintJobForm = ({title, formValues, formOptions, key_, onFinish }) => {
     const { mediaSizes, colorModes } = formOptions;
     
     var defaultValues = {
@@ -16,7 +16,7 @@ const PrintJobForm = ({title, formValues, formOptions, key, onFinish }) => {
     }
 
     return <Form
-        key={key}
+        key={key_}
         name="create-job"
         id="create-job-form"
         layout="vertical"

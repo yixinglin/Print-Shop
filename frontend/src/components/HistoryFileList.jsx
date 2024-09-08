@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Table, Pagination, Button, Space, Input, Flex } from 'antd';
-import { PrinterOutlined, DeleteOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
+import { Table, Pagination, Button, Space, Input, Flex, Checkbox } from 'antd';
+import { PrinterOutlined, DeleteOutlined, SearchOutlined, EyeOutlined, UndoOutlined} from '@ant-design/icons';
 import UploadDragger from './buttons/UploadDragger';
 import DeleteConfirmButton from './buttons/DeleteConfirmButton';
 import { get_upload_file_url } from '../rest/printer'
+import {formatDateToLocal} from '../utils/date'
+import {convertFileSizeToString} from '../utils/file'
 
 const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDownload,
-  handleAdd, handleEmpty }) => {
+  handleAdd, handleArchiveIncluded, handleEmpty, handleRestore }) => {
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [searchText, setSearchText] = useState('');
@@ -14,25 +17,41 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
   const columns = [
     {
       title: 'Created At',
-      dataIndex: 'create_at',
-      key: 'create_at',
+      dataIndex: 'created_at',
+      key: 'created_at',            
       width: 200,
+      render: (text) => (
+        <span>{formatDateToLocal(text, 'YYYY-MM-DD HH:mm:ss')}</span>
+      ),
     },
     {
       title: 'Filename',
-      dataIndex: 'filename',
-      key: 'filename',
+      dataIndex: 'file_name',
+      key: 'file_name',
+      render: (text, record) => {
+        return record.archived? <span style={{ textDecoration: 'line-through', color: 'gray' }}>{text}</span> : text
+      }                  
     },
     {
       title: 'Size',
-      dataIndex: 'size',
-      key: 'size',
+      dataIndex: 'file_size',
+      key: 'file_size',
       width: 150,
+      render: (size) => (
+        <span>{convertFileSizeToString(size)}</span>
+      ),
+    },
+    {
+      title: 'Hash',
+      dataIndex: 'file_hash',
+      key: 'file_hash',
+      ellipsis: true,
+      width: 120,
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 150,
+      width: 200,
       render: (text, record) => (
         <Space size="middle">
           <Button
@@ -48,6 +67,10 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
             danger
             icon={<DeleteOutlined />}
             onClick={() => { handleDelete ? handleDelete(record) : null }}
+          />
+          <Button            
+            icon={<UndoOutlined />}
+            onClick={() => { handleRestore ? handleRestore(record) : null }}
           />
         </Space>
       ),
@@ -70,7 +93,7 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
 
   // 过滤文件列表
   const filteredFiles = files.filter(file =>
-    file.filename.toLowerCase().includes(searchText.toLowerCase())
+    file.file_name.toLowerCase().includes(searchText.toLowerCase())
   );
 
   const resetSearchKeyword = () => {
@@ -92,7 +115,7 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
           style={{ width: '300px' }}
         />
         <Button type="primary" onClick={() => { resetSearchKeyword ? resetSearchKeyword() : null }} >Reset</Button>
-
+        <Checkbox style={{ marginLeft: '10px' }} onChange={handleArchiveIncluded}>Include Archived Files</Checkbox>
         <DeleteConfirmButton
           buttonText="Remove All Files"
           popconfirmTitle="Remove All Files"
@@ -103,7 +126,7 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
           danger
         />
 
-        <span>Total Size: {totalSize}</span>
+        <span>Total Size: {convertFileSizeToString(totalSize)}</span>
         {/* <span>Files: {filteredFiles.length}</span> */}
       </Flex >
       <UploadDragger url={get_upload_file_url()} />
@@ -111,7 +134,7 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
         columns={columns}
         dataSource={paginatedFiles}  // 使用分页后的数据
         pagination={false}  // 关闭默认分页
-        rowKey="filename"
+        rowKey={record => record.key}
         cellFontSizeSM={10}
       />
       <Pagination

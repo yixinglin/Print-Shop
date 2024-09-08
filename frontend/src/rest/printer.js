@@ -58,12 +58,25 @@ export function delete_all_jobs() {
     return delete_method(apiUrl + '/jobs/cancel/all/');
 }
 
+export function get_cups_admin_url() {
+    return cupsUrl;
+}
+
+export function get_printer_status_ws_listener_url(printer) {
+    return `${wsUrl}/printer/${printer}`;
+}
+
+/**
+ * 
+  File System Operations
+ */
+
 export function post_create_job(body) {
     return post_method(apiUrl + '/jobs/create/from_history', body);
 }
 
-export function fetch_list_history_files() {
-    return get_method(apiUrl + '/history/files');
+export function fetch_list_history_files({include_archived}) {    
+    return get_method(apiUrl + '/history/files?include_archived=' + include_archived);
 }
 
 export function post_upload_file(body) {
@@ -87,24 +100,28 @@ function delete_method(url) {
     return axios.delete(url, { headers: headers });
 }
 
-export function delete_file(filename) {
-    return delete_method(apiUrl + '/history/file/' + filename);
+function put_method(url, body) {
+    const headers = {};
+    headers['Authorization'] = `Basic ${calc_token()}`;    
+    headers['Content-Type'] = 'application/json';
+    return axios.put(url, body, { headers: headers });
+}
+
+export function delete_file(hash) {
+    return delete_method(apiUrl + '/history/file/archive/' + hash);
 }
 
 export function delete_all_files() {
-    return delete_method(apiUrl + '/history/empty');
+    return delete_method(apiUrl + '/history/file/archive-all');
 }
 
-export function get_download_file_url(filename) {
-    var url = apiUrl + '/history/down/' + filename;
+export function restore_file(hash) {
+    return put_method(apiUrl + '/history/file/unarchive/' + hash, {});
+}
+
+export function get_download_file_url(hash) {
+    var url = apiUrl + '/history/down/' + hash;
     url += '?embedded=true'
     return url;
 }
 
-export function get_cups_admin_url() {
-    return cupsUrl;
-}
-
-export function get_printer_status_ws_listener_url(printer) {
-    return `${wsUrl}/printer/${printer}`;
-}

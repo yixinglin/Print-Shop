@@ -1,8 +1,12 @@
 
-from fastapi import APIRouter, UploadFile, HTTPException
 import os
-import services.lib as lib 
-from .print_history import history_file_path
+
+from fastapi import APIRouter, HTTPException
+
+import services.lib as lib
+from api import history_file_path
+from models import T_PrintFile
+from services.FileSystemService import FileSystemService
 
 cups = APIRouter(prefix="/cups", tags=["CUPS Backend"])
 
@@ -75,8 +79,11 @@ def cancel_all_print_jobs():
 @cups.post("/jobs/create/from_history/")
 def create_job_print_history_file(job: lib.PrintJob):
     try:
-        file_path = os.path.join(history_file_path, job.filename)
-        print(file_path)
+        # file_path = os.path.join(history_file_path, job.filename)
+        svc = FileSystemService(history_file_path)
+        print_file: T_PrintFile = asyncio.run(svc.query_file_by_hash(job.hash))
+        # print(file_path)
+        file_path = os.path.join(history_file_path, print_file.file_hash+'.'+print_file.file_extension)
         print("Job Created: ", job)
         job_id = lib.create_job(job.printer_name, file_path, job.title, job.options)
         return {"job_id": job_id, 

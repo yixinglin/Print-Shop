@@ -1,8 +1,16 @@
+import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from .routes.cups_routes import cups
-from .routes.print_history import hist, history_file_path
+from core.db import init_db_sqlite
+import sys
+history_file_path = os.path.join(os.getcwd(), "history")
+from .routes.print_history import hist
+
+if sys.platform == "linux":
+    from .routes.cups_routes import cups
+else:
+    cups = APIRouter(prefix="/cups")
 
 
 
@@ -16,5 +24,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
 cups.include_router(hist)
 app.include_router(cups)
+
+init_db_sqlite(app)

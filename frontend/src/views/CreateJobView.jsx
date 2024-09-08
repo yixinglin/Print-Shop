@@ -151,7 +151,7 @@ function CreateJobView() {
             formValues.copies = 1;
             formValues.pageSet = "all";
             formValues.pageRange = null;
-            formValues.title = file.filename;
+            formValues.title = file.file_name;
         }
 
         return formValues;
@@ -171,7 +171,8 @@ function CreateJobView() {
         const printerName = currentPrinter['printer-name'];
         const jobDetails = {
             printer_name: printerName,
-            filename: file.filename,
+            filename: file.file_name,
+            hash: file.file_hash,
             title: formValues.title,
             options: options
         };
@@ -207,9 +208,10 @@ function CreateJobView() {
         }
         // console.log("Form Data:", formData);
         // console.log("Form Options:", formOptions);
+        
         return <PrintJobForm
-            key={formKey}
-            title={file.filename}
+            key_={formKey}
+            title={file.file_name}
             formValues={formValues}
             formOptions={formOptions}
             onFinish={onFinish}
@@ -236,14 +238,14 @@ function CreateJobView() {
                 <PrinterList printers={printers} handleClickCard={handleClickPrinterCard} />
             </div>
 
-            <p style={styles.selected_printer}>🖨️【{currentPrinter['printer-name']}】 📌【{file.filename}】 </p>
+            <p style={styles.selected_printer}>🖨️【{currentPrinter['printer-name']}】 📌【{file.file_name}】 </p>
     
             <Flex wrap justify="left" gap="large" >
                 <div style={{ minWidth: '300px' }}>
                     {currentPrinterAttrs ? initForm() : null}
                 </div>
                 <div>
-                    {file && currentPrinterAttrs ? <PDFViewer url={get_download_file_url(file.filename)}
+                    {file && currentPrinterAttrs ? <PDFViewer url={get_download_file_url(file.file_hash)}
                         width="680px" height="600" title="📃 Document" /> : null}
                 </div>                            
             </Flex>            

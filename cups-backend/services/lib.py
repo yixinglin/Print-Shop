@@ -2,11 +2,13 @@ import cups
 import time
 from typing import List
 from pydantic import BaseModel
-import utils 
+from utils import utils
+
 
 class PrintJob(BaseModel):
     printer_name: str
     filename: str  # filename in the history directory
+    hash: str  # hash of the file in the history directory
     title: str = "Print Job"
     options: dict={}
 
