@@ -9,6 +9,7 @@ services:
     network_mode: host         
     restart: on-failure:5
     volumes:
-      - ./history:/code/history
+      - ./temp:/code/temp
+      - ./conf:/code/conf
     environment:
       - NODE_ENV=production

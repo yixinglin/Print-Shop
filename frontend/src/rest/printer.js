@@ -119,9 +119,12 @@ export function restore_file(hash) {
     return put_method(apiUrl + '/history/file/unarchive/' + hash, {});
 }
 
-export function get_download_file_url(hash) {
-    var url = apiUrl + '/history/down/' + hash;
-    url += '?embedded=true'
+export function get_download_file_url(hash, embedded, enabled_watermark) {
+    var url = apiUrl + '/history/file/down/' + hash;
+    url += `?embedded=${embedded}&enabled_watermark=${enabled_watermark}`
     return url;
 }
 
+export function accumulate_file_print_count(hash) {
+    return put_method(apiUrl + '/history/file/print-count/1/' + hash, {});
+}

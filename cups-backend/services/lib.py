@@ -2,7 +2,7 @@ import cups
 import time
 from typing import List
 from pydantic import BaseModel
-from utils import utils
+from utils import strutils
 
 
 class PrintJob(BaseModel):
@@ -10,6 +10,7 @@ class PrintJob(BaseModel):
     filename: str  # filename in the history directory
     hash: str  # hash of the file in the history directory
     title: str = "Print Job"
+    enabled_watermark: bool = False
     options: dict={}
 
 
@@ -87,13 +88,14 @@ def list_printers() -> List:
 
 
 def create_job(printer_name: str, file_path: str, title: str, options: dict):
+    # TODO: 打印加上水印功能
     print(f"Create Job ({title}) with options:\n{options}")
     print(f"File Path: {file_path}")
     conn = cups.Connection() 
 
     if options:
         # Remove empty fields
-        options = {k: v for k, v in options.items() if not utils.isEmptyString(v)}
+        options = {k: v for k, v in options.items() if not strutils.isEmptyString(v)}
         print(f"Options after removing empty fields: {options}")
     job_id = conn.printFile(printer_name, file_path, title, options)
     print("Job ID:", job_id)

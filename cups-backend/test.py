@@ -1,8 +1,7 @@
-import cups 
+import time
 
-def test_job():
-    conn = cups.Connection()
-    attrs = conn.getJobAttributes(212)
-    print(attrs)
+from core.db import *
 
-test_job()
+while (True):
+    backup_database()
+    time.sleep(1) # Run every hour

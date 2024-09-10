@@ -1,11 +1,17 @@
-import os
+import sys
 
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+
+from core.config import cups_client_config as config
 from core.db import init_db_sqlite
-import sys
-history_file_path = os.path.join(os.getcwd(), "history")
+history_file_path = config.history.path
+log_file_path = config.logging.path
+
+
 from .routes.print_history import hist
+from services.scheduler import scheduler
+from core.log import logger
 
 if sys.platform == "linux":
     from .routes.cups_routes import cups
@@ -30,3 +36,20 @@ cups.include_router(hist)
 app.include_router(cups)
 
 init_db_sqlite(app)
+
+
+@app.on_event("startup")
+def app_start():
+    print("FastAPI app started_")
+    logger.info("FastAPI app started")
+    logger.info(config)
+    scheduler.start()
+
+@app.on_event("shutdown")
+def app_stop():
+    print("FastAPI app stopped")
+    scheduler.shutdown()
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Print Server API"}

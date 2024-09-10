@@ -6,3 +6,5 @@ ssh
 database
 conf
 test_*.py
+logs
+*.tar.gz

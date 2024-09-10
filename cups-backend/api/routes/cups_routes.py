@@ -1,11 +1,13 @@
-
+import datetime
 import os
+import tempfile
 
 from fastapi import APIRouter, HTTPException
 
 import services.lib as lib
 from api import history_file_path
-from models import T_PrintFile
+from core.log import logger
+from schemas.filesys import PrintFile_Pydantic
 from services.FileSystemService import FileSystemService
 
 cups = APIRouter(prefix="/cups", tags=["CUPS Backend"])
@@ -70,22 +72,30 @@ def cancel_print_job(job_id: int):
 def cancel_all_print_jobs():
     try:
         ans = lib.cancel_all_jobs()
-        print(ans)
+        # print(ans)
+        logger.info(ans)
         return {"status": "All print jobs cancelled successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @cups.post("/jobs/create/from_history/")
-def create_job_print_history_file(job: lib.PrintJob):
+def create_job_from_history_print_file(job: lib.PrintJob):
     try:
-        # file_path = os.path.join(history_file_path, job.filename)
         svc = FileSystemService(history_file_path)
-        print_file: T_PrintFile = asyncio.run(svc.query_file_by_hash(job.hash))
-        # print(file_path)
+        print_file: PrintFile_Pydantic = asyncio.run(svc.query_file_by_hash(job.hash))
         file_path = os.path.join(history_file_path, print_file.file_hash+'.'+print_file.file_extension)
-        print("Job Created: ", job)
-        job_id = lib.create_job(job.printer_name, file_path, job.title, job.options)
+
+        if job.enabled_watermark:
+            with tempfile.NamedTemporaryFile() as tmp_file:
+                watermark_text = svc.generate_watermark_text(print_file)
+                wm_pdf_bytes = svc._add_watermark_to_pdf(file_path, watermark_text)
+                tmp_file.write(wm_pdf_bytes)
+                file_path = tmp_file.name
+                logger.info(f"Job Created: {job}")
+                job_id = lib.create_job(job.printer_name, file_path, job.title, job.options)
+        else:
+            logger.info(f"Job Created: {job}")
+            job_id = lib.create_job(job.printer_name, file_path, job.title, job.options)
         return {"job_id": job_id, 
                 "status": "Printing initiated"}
     except Exception as e:
@@ -103,14 +113,14 @@ manager = ConnectionManager()
 async def websocket_endpoint(printer_name: str, websocket: WebSocket):
     await manager.connect(websocket)
     count = 0
+    MAX_CONNECTION_TIME = 1200  #  20 minutes
+    start_time = datetime.datetime.now()
     try:
         while True:
             # 在这里可以根据实际情况获取打印机状态并发送给客户端
             # 比如：message = get_printer_status()
-            # Process id
             pid = os.getpid()
-            print(f"ws[{pid}-{count}]: Sending printer status for {printer_name}")
-            # status = lib.printer_attributes_brief(printer_name)                        
+            logger.info(f"ws[{pid}-{count}]: Sending printer status for {printer_name}")
             printers = lib.list_printers()
             printers = [p for p in printers if p['printer-name'] == printer_name]
             jobs = lib.print_jobs()
@@ -120,9 +130,16 @@ async def websocket_endpoint(printer_name: str, websocket: WebSocket):
                 raise RuntimeError(f"Printer {printer_name} not found")
             message = json.dumps(printer)
             await manager.send_message(message)                        
-            await asyncio.sleep(1)     
-            count += 1       
+            await asyncio.sleep(1)
+
+            elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
+            if elapsed_time > MAX_CONNECTION_TIME:
+                logger.info(f"ws[{pid}-{count}]: Connection time exceeded {MAX_CONNECTION_TIME} seconds, disconnecting")
+                break
+            count += 1
     except (WebSocketDisconnect, Exception) as e:    
-        print("ws: Disconnected--: ", e)
+        logger.error(f"ws[{pid}-{count}]: Error: {e}")
+    finally:
         manager.disconnect(websocket)
+        logger.info("ws: Disconnected--: ")
 

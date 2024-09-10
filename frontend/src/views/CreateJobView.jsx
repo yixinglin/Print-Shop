@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { fetch_printers, post_create_job, get_printer_status_ws_listener_url , 
-    fetch_printer_attributes, get_cups_admin_url, get_download_file_url } from '../rest/printer.js';
+    fetch_printer_attributes, get_cups_admin_url, get_download_file_url, accumulate_file_print_count } from '../rest/printer.js';
 import PrinterList from '../components/PrinterList';
 import PrintJobForm from '../components/forms/PrintJobForm';
 import PDFViewer from '../components/PDFViewer.jsx';
 import { message, Select, Flex } from 'antd';
 import { useLocation } from 'react-router-dom';
 import { saveToLocalStorage, restoreFromLocalStorage } from "../core/storage"
-import { useNavigate } from 'react-router-dom';
 
 
 const { Option } = Select;
@@ -165,7 +164,7 @@ function CreateJobView() {
             "media": formValues.paperSize,
             "print-scaling": formValues.printScaling,
             "page-set": formValues.pageSet,
-            "print-color-mode": formValues.colorMode
+            "print-color-mode": formValues.colorMode,            
         }
 
         const printerName = currentPrinter['printer-name'];
@@ -174,6 +173,7 @@ function CreateJobView() {
             filename: file.file_name,
             hash: file.file_hash,
             title: formValues.title,
+            enabled_watermark: formValues.enabledWatermark,
             options: options
         };
 
@@ -183,6 +183,8 @@ function CreateJobView() {
         post_create_job(JSON.parse(detailsStr))
             .then(response => {
                 messagePopup(`Print job created: ${response.data.job_id}`);
+            }).then(() => {
+                accumulate_file_print_count(file.file_hash);
             })
             .catch(error => errorPopup(`Error creating print job: ${error}`));
     };
@@ -197,6 +199,7 @@ function CreateJobView() {
                 colorMode: "monochrome",
                 printScaling: "auto",
                 pageSet: "all",
+                enabledWatermark: true,
             }
         }
 
@@ -245,7 +248,7 @@ function CreateJobView() {
                     {currentPrinterAttrs ? initForm() : null}
                 </div>
                 <div>
-                    {file && currentPrinterAttrs ? <PDFViewer url={get_download_file_url(file.file_hash)}
+                    {file && currentPrinterAttrs ? <PDFViewer url={get_download_file_url(file.file_hash, true, true)}
                         width="680px" height="600" title="📃 Document" /> : null}
                 </div>                            
             </Flex>            

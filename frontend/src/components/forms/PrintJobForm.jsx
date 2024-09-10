@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Select, InputNumber, Radio } from 'antd';
+import { Form, Input, Button, Select, InputNumber, Radio, Switch  } from 'antd';
 
 const PrintJobForm = ({title, formValues, formOptions, key_, onFinish }) => {
     const { mediaSizes, colorModes } = formOptions;
@@ -9,10 +9,11 @@ const PrintJobForm = ({title, formValues, formOptions, key_, onFinish }) => {
         paperSize: "iso_a4_210x297mm",
         colorMode: "monochrome",
         printScaling: "",
-        pageSet: "all"
+        pageSet: "all",
+        enabledWatermark: true,
     }
     if (formValues) {
-        defaultValues = formValues;
+        defaultValues = formValues;        
     }
 
     return <Form
@@ -100,6 +101,12 @@ const PrintJobForm = ({title, formValues, formOptions, key_, onFinish }) => {
             <Button type="primary" htmlType="submit">
                 Start to Print
             </Button>
+        </Form.Item>
+        <Form.Item
+            label="Watermark"
+            name="enabledWatermark"
+            tooltip="Add a watermark to the print job">
+            <Switch checkedChildren="On" unCheckedChildren="Off" defaultChecked  />
         </Form.Item>
     </Form>
 

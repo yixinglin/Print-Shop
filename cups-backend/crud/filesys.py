@@ -1,11 +1,9 @@
 import hashlib
 import time
-
 from fastapi import UploadFile
 from tortoise.exceptions import IntegrityError
-
+from core.log import logger
 from models.filesys import T_PrintFile
-from schemas.filesys import PrintFile_Pydantic
 
 
 class PrintFileCRUD:
@@ -18,7 +16,8 @@ class PrintFileCRUD:
         data = await file.read()
         # Generate hash object from file content
         hash_object = hashlib.md5(data)
-        print(f"Adding file: {file.filename}; {hash_object.hexdigest()}")
+        # print(f"Adding file: {file.filename}; {hash_object.hexdigest()}")
+        logger.info(f"Adding file: {file.filename}; {hash_object.hexdigest()}")
         # Extract file extension
         name_split = file.filename.split(".")
         if len(name_split) > 1:
@@ -29,9 +28,11 @@ class PrintFileCRUD:
         # Check if file with same hash already exists
         print_file = await self.query_file_by_hash(hash_object.hexdigest())
         if print_file:
-            print(f"File with hash {hash_object.hexdigest()} already exists!")
+            # print(f"File with hash {hash_object.hexdigest()} already exists!")
+            logger.warning(f"File with hash {hash_object.hexdigest()} already exists!")
             print_file.archived = False
             print_file.file_name = file.filename
+            print_file.file_path = file_path
             await print_file.save()
             return print_file.id
 

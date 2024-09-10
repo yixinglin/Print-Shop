@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Pagination, Button, Space, Input, Flex, Checkbox } from 'antd';
+import { Table, Pagination, Button, Space, Input, Flex, Checkbox, Tooltip, Tag } from 'antd';
 import { PrinterOutlined, DeleteOutlined, SearchOutlined, EyeOutlined, UndoOutlined} from '@ant-design/icons';
 import UploadDragger from './buttons/UploadDragger';
 import DeleteConfirmButton from './buttons/DeleteConfirmButton';
@@ -13,6 +13,11 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [searchText, setSearchText] = useState('');
+
+  const createPrintCountColumn = (text, record) =>  {    
+    const tag = record.print_count > 0? <Tag color="blue">{record.print_count}</Tag> : <Tag color="volcano"> 新 </Tag>
+    return <span>{tag}</span>
+  }
 
   const columns = [
     {
@@ -29,17 +34,27 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
       dataIndex: 'file_name',
       key: 'file_name',
       render: (text, record) => {
-        return record.archived? <span style={{ textDecoration: 'line-through', color: 'gray' }}>{text}</span> : text
+        return record.archived? <span style={{ textDecoration: 'line-through', color: 'gray' }}>{text}</span> : text;
       }                  
     },
     {
       title: 'Size',
       dataIndex: 'file_size',
       key: 'file_size',
-      width: 150,
+      width: 100,
       render: (size) => (
         <span>{convertFileSizeToString(size)}</span>
       ),
+    },
+    {
+      title: 'Count',
+      dataIndex: 'print_count',
+      key: 'print_count',
+      width: 70,
+      align: 'right',
+      render: (count, record) => (
+        <Tooltip title="Print count">{createPrintCountColumn(count, record)}</Tooltip>        
+      )   
     },
     {
       title: 'Hash',
@@ -54,24 +69,36 @@ const HistoryFileList = ({ files, totalSize, handlePrint, handleDelete, handleDo
       width: 200,
       render: (text, record) => (
         <Space size="middle">
-          <Button
-            type="primary"
-            icon={<PrinterOutlined />}
-            onClick={() => { handlePrint ? handlePrint(record) : null }}
-          />
-          <Button
-            icon={<EyeOutlined />}
-            onClick={() => { handleDownload ? handleDownload(record) : null }}
-          />
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => { handleDelete ? handleDelete(record) : null }}
-          />
-          <Button            
-            icon={<UndoOutlined />}
-            onClick={() => { handleRestore ? handleRestore(record) : null }}
-          />
+          <Tooltip title="Print file">
+            <Button
+              type="primary"
+              icon={<PrinterOutlined />}
+              onClick={() => { handlePrint ? handlePrint(record) : null }}
+            />
+          </Tooltip>
+          <Tooltip title="View file">
+            <Button
+              icon={<EyeOutlined />}
+              onClick={() => { handleDownload ? handleDownload(record) : null }}
+            />
+          </Tooltip>
+
+        <Tooltip title="Delete or restore file">
+          {!record.archived?           
+                <Button
+                  danger                
+                  icon={<DeleteOutlined />}
+                  onClick={() => { handleDelete ? handleDelete(record) : null }}
+                />
+                :
+                  <Button            
+                  icon={<UndoOutlined />}
+                  onClick={() => { handleRestore ? handleRestore(record) : null }}
+                />
+            }
+        </Tooltip>
+
+    
         </Space>
       ),
     },

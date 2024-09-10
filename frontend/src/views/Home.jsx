@@ -43,7 +43,7 @@ function Home() {
   };
 
   const handleDownload = (record) => {
-    const url = get_download_file_url(record.file_hash)
+    const url = get_download_file_url(record.file_hash, true, false);
     console.log('Download:', url);
     window.open(url, '_blank');
   }

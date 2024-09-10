@@ -4,6 +4,7 @@ ADD . /code
 WORKDIR /code
 
 RUN apt-get update && apt-get install -y gcc libcups2-dev
+RUN apt-get install fonts-wqy-zenhei -y
 
 
 RUN pip3 install --upgrade pip
