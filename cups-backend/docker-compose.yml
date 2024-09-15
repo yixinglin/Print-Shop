@@ -12,4 +12,4 @@ services:
       - ./temp:/code/temp
       - ./conf:/code/conf
     environment:
-      - NODE_ENV=production
+      - CUPS_CONFIG_FILE=conf/cups_client.yaml

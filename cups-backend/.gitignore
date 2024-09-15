@@ -8,3 +8,4 @@ conf
 test_*.py
 logs
 *.tar.gz
+.env
